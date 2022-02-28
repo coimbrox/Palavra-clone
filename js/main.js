@@ -1,14 +1,35 @@
 document.addEventListener("DOMContentLoaded", () => {
   createSquares();
+  getNewWord();
 
   let guessedWords = [[]]
-  let avaliableSpace = 1;
-  let word = "dairy"
+  let availableSpace = 1;
+  let word;
   let guessWordCount = 0;
 
   const keys = document.querySelectorAll('.keyboard-row button')
 
-
+  function getNewWord() {
+    fetch(
+      `https://wordsapiv1.p.rapidapi.com/words/?random=true&lettersMin=5&lettersMax=5`,
+      {
+        method: "GET",
+        headers: {
+          'x-rapidapi-host': 'wordsapiv1.p.rapidapi.com',
+          'x-rapidapi-key': '4b4d126e83msh2c8fd438e60c14dp16d2f0jsn656a9f8d779b'
+        },
+      }
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((res) => {
+        word = res.word;
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+  }
 
   function getCurrentWordArr() {
     const numberOfGuessedWords = guessedWords.length
@@ -21,10 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentWordArr && currentWordArr.length < 5) {
       currentWordArr.push(letter)
 
-      const avaliableSpaceEl = document.getElementById(String(avaliableSpace))
-      avaliableSpace = avaliableSpace + 1
+      const availableSpaceEl = document.getElementById(String(availableSpace));
+      availableSpace = availableSpace + 1
 
-      avaliableSpaceEl.textContent = letter;
+      availableSpaceEl.textContent = letter;
     }
   }
 
@@ -56,30 +77,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentWord = currentWordArr.join("");
 
 
-    const firstLetterId = guessWordCount * 5 + 1;
-    const interval = 200;
+    fetch(
+      `https://wordsapiv1.p.rapidapi.com/words/${currentWord}`,
+      {
+        method: "GET",
+        headers: {
+          'x-rapidapi-host': 'wordsapiv1.p.rapidapi.com',
+          'x-rapidapi-key': '4b4d126e83msh2c8fd438e60c14dp16d2f0jsn656a9f8d779b'
+        },
+      }
+    ).then((res) => {
+      if (!res.ok) {
+        throw Error()
+      }
 
-    currentWordArr.forEach((letter, index) => {
-      setTimeout(() => {
-        const tileColor = getTileColor(letter, index);
+      const firstLetterId = guessWordCount * 5 + 1;
+      const interval = 200;
 
-        const letterId = firstLetterId + index;
-        const letterEl = document.getElementById(letterId);
-        letterEl.classList.add("animate__flipInX");
-        letterEl.style = `background-color:${tileColor};border-color:${tileColor}`
+      currentWordArr.forEach((letter, index) => {
+        setTimeout(() => {
+          const tileColor = getTileColor(letter, index);
 
-      }, interval * index)
-    });
+          const letterId = firstLetterId + index;
+          const letterEl = document.getElementById(letterId);
+          letterEl.classList.add("animate__flipInX");
+          letterEl.style = `background-color:${tileColor};border-color:${tileColor}`
 
-    guessWordCount += 1;
+        }, interval * index)
+      });
 
-    if (currentWord === word) {
-      window.alert("Parabéns!")
-    }
-    if (guessedWords.length === 6) {
-      window.alert(`Você perdeu! A palavra correta era ${word}.`)
-    }
-    guessedWords.push([])
+      guessWordCount += 1;
+
+      if (currentWord === word) {
+        window.alert("Parabéns!")
+      }
+      if (guessedWords.length === 6) {
+        window.alert(`Você perdeu! A palavra correta era ${word}.`)
+      }
+      guessedWords.push([])
+    }).catch(() => {
+      window.alert("Palavra não é conhecida")
+    })
+
+
 
   }
 
@@ -98,6 +138,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  function handleDeleteLetter() {
+    const currentWordArr = getCurrentWordArr();
+    const removedLetter = currentWordArr.pop();
+
+    guessedWords[guessedWords.length - 1] = currentWordArr;
+
+    const lastLetterEl = document.getElementById(String(availableSpace - 1));
+
+    lastLetterEl.textContent = "";
+    availableSpace = availableSpace - 1;
+  }
+
+
   for (let i = 0; i < keys.length; i++) {
     keys[i].onclick = ({ target }) => {
       const letter = target.getAttribute("data-key")
@@ -108,6 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+
+      if (letter === "del") {
+        handleDeleteLetter();
+        return;
+      }
       updateGuessedWords(letter)
     }
   }
