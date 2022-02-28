@@ -3,16 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let guessedWords = [[]]
   let avaliableSpace = 1;
+  let word = "fedor"
 
   const keys = document.querySelectorAll('.keyboard-row button')
 
-  for (let i = 0; i < keys.length; i++) {
-    keys[i].onclick = ({ target }) => {
-      const letter = target.getAttribute("data-key")
 
-      updateGuessedWords(letter)
-    }
-  }
 
   function getCurrentWordArr() {
     const numberOfGuessedWords = guessedWords.length
@@ -32,6 +27,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+
+  function handleSubmitWord() {
+    const currentWordArr = getCurrentWordArr()
+    if (currentWordArr.length !== 5) {
+      window.alert("Palavra precisa ter 5 letras!")
+    }
+
+    const currentWord = currentWordArr.join('')
+    if (currentWord === word) {
+      window.alert("Parabéns!")
+    }
+    if (guessedWords.length === 6) {
+      window.alert(`Você perdeu! A palavra correta era ${word}.`)
+    }
+    guessedWords.push([])
+
+  }
+
   function createSquares() {
     const gameBoard = document.getElementById("board")
 
@@ -46,10 +59,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  for (let i = 0; i < keys.length; i++) {
+    keys[i].onclick = ({ target }) => {
+      const letter = target.getAttribute("data-key")
+
+
+      if (letter === 'enter') {
+        handleSubmitWord()
+        return;
+      }
+
+      updateGuessedWords(letter)
+    }
+  }
 
 
 
 
 
-
-})
+});
