@@ -3,7 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let guessedWords = [[]]
   let avaliableSpace = 1;
-  let word = "fedor"
+  let word = "dairy"
+  let guessWordCount = 0;
 
   const keys = document.querySelectorAll('.keyboard-row button')
 
@@ -29,12 +30,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function handleSubmitWord() {
-    const currentWordArr = getCurrentWordArr()
+    const currentWordArr = getCurrentWordArr();
     if (currentWordArr.length !== 5) {
       window.alert("Palavra precisa ter 5 letras!")
     }
 
-    const currentWord = currentWordArr.join('')
+    const currentWord = currentWordArr.join("");
+
+
+    const firstLetterId = guessWordCount * 5 + 1;
+    const interval = 200;
+
+    currentWordArr.forEach((letter, index) => {
+      setTimeout(() => {
+        const tileColor = "rgb(58, 58, 60)";
+
+        const letterId = firstLetterId + index;
+        const letterEl = document.getElementById(letterId);
+        letterEl.classList.add("animate__flipInX");
+        letterEl.style = `background-color:${tileColor};border-color:${tileColor}`
+
+      }, interval * index)
+    });
+
+    guessWordCount += 1;
+
     if (currentWord === word) {
       window.alert("Parabéns!")
     }
@@ -51,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let index = 0; index < 30; index++) {
       let square = document.createElement("div");
       square.classList.add("square");
+      square.classList.add("animate__animated");
       square.setAttribute("id", index + 1);
       gameBoard.appendChild(square);
 
