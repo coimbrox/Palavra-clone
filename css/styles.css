@@ -17,6 +17,14 @@ body {
   flex-direction: column;
 }
 
+#game {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 header {
   border-bottom: 1px solid (rgb(58, 58, 60));
 }
@@ -78,4 +86,13 @@ header {
   flex-grow: 1;
   text-transform: uppercase;
   margin-right: 6px;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.keyboard-row button.wide-button {
+  flex-grow: 1.5;
+}
+.spacer-half {
+  flex-grow: 0.5;
 }
